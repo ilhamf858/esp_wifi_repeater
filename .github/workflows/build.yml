@@ -22,11 +22,14 @@ jobs:
           python --version
 
       - name: Get esp-open-sdk
-        run: |
-          git clone --recursive https://github.com/pfalcon/esp-open-sdk.git
-          cd esp-open-sdk
-          export BASH=/bin/bash
-          make STANDALONE=y
+  run: |
+    git clone --recursive https://github.com/pfalcon/esp-open-sdk.git
+    cd esp-open-sdk
+    export BASH=/bin/bash
+    export CONFIG_SHELL=/bin/bash
+    export SHELL=/bin/bash
+    /bin/bash --version
+    make STANDALONE=y
 
       - name: Build firmware
         run: |
