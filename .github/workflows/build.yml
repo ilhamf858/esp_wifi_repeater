@@ -1,4 +1,4 @@
-name: Build esp_wifi_repeater (ESP8266 firmware)
+name: Build ESP8266 WiFi Repeater Firmware
 
 on:
   workflow_dispatch:
@@ -13,26 +13,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies & ESP8266 toolchain
+      - name: Install dependencies and ESP8266 toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y make unrar-free autoconf automake libtool gcc g++ gperf flex bison texinfo gawk ncurses-dev \
-            libexpat-dev python3 python3-dev python3-pip git wget help2man gperf unzip bash \
+          sudo apt-get install -y make autoconf automake libtool gcc g++ gperf flex bison texinfo gawk ncurses-dev \
+            libexpat-dev python3 python3-dev python3-pip git wget help2man unzip bash \
             gcc-xtensa-lx106 binutils-xtensa-lx106
           sudo ln -sf /usr/bin/python3 /usr/bin/python
-          bash --version
-          xtensa-lx106-elf-gcc --version || true
+          echo "✅ Toolchain Installed"
+          xtensa-lx106-elf-gcc --version
 
-      - name: Build firmware
+      - name: Build firmware (system toolchain)
         run: |
           export PATH=/usr/bin:$PATH
+          echo "🔧 Building firmware..."
           make clean
-          make
+          make SDK_PATH=/usr XTENSA_TOOLS_ROOT=/usr/bin
 
-      - name: Upload firmware
+      - name: Upload compiled firmware
         uses: actions/upload-artifact@v4
         with:
-          name: firmware-bin
+          name: esp8266-firmware-bin
           path: |
             *.bin
             firmware/*.bin
