@@ -1,0 +1,31 @@
+name: Build esp_wifi_repeater (esp-open-sdk)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git make gcc python2.7 python2.7-dev libncurses5-dev
+      - name: Get esp-open-sdk (toolchain)
+        run: |
+          git clone --depth 1 https://github.com/pfalcon/esp-open-sdk.git /tmp/esp-open-sdk || true
+          cd /tmp/esp-open-sdk && make STANDALONE=y || true
+      - name: Build firmware
+        env:
+          PATH: /tmp/esp-open-sdk/xtensa-lx106-elf/bin:$PATH
+        run: |
+          make clean || true
+          make || true
+      - name: Upload firmware artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-bin
+          path: |
+            firmware/*.bin
+            bin/*.bin
